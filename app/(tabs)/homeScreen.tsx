@@ -284,8 +284,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    height: LADO,
-    width: LADO,
+    maxHeight: LADO,
+    maxWidth: LADO,
   },
   fixedOptionText: {
     fontSize: 12,
@@ -306,8 +306,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 5,
-    height: LADO,
-    width: LADO,
+    maxHeight: LADO,
+    maxWidth: LADO,
   },
   logoutButtonRoundText: {
     fontSize: 13,
