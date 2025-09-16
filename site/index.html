@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa de Frequência - EEEP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 0px;
+        }
+
+        .header-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding: 0px;
+            margin-bottom: 0px;
+        }
+
+        .header-wrapperMain {
+            padding: 10px;
+            margin-bottom: 0px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background-color: #fff;
+        }
+
+        .header-icon {
+            width: 60px;
+            height: auto;
+        }
+
+        .titles-wrapper {
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        h3 {
+            text-align: center;
+            padding: 1px;
+            margin: 1px;
+            font-size: 10px;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 1px;
+            margin: 1px;
+            font-size: 23px;
+        }
+
+        h2 {
+            text-align: center;
+            padding: 1px;
+            margin: 1px;
+            font-size: 20px;
+        }
+
+        .selects-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 15px;
+        }
+
+        .select-container {
+            flex: 1 1 160px;
+            min-width: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .selects-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .select-container {
+                flex: 1;
+                min-width: 20px;
+            }
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+        }
+
+        select {
+            width: 100%;
+            padding: 2px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .mapa-container {
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+
+        .mapa-tabela {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .mapa-tabela th,
+        .mapa-tabela td {
+            border: 1px solid #ddd;
+            padding: 2px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .mapa-tabela th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .mapa-tabela tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .mapa-tabela tbody tr:hover {
+            background-color: #eaeaea;
+        }
+
+        .aluno-nome {
+            min-width: 200px;
+        }
+
+        .centered-cell {
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+            margin-top: 20px;
+        }
+
+        .error {
+            color: red;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .conteudo-tabela {
+            margin-top: 30px;
+        }
+
+        .conteudo-tabela td {
+            white-space: normal;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="header-wrapperMain">
+            <div class="header-wrapper">
+                <img src="../assets/images/icon.png" alt="Logotipo" class="header-icon">
+                <div class="titles-wrapper">
+                    <h1>EEEP Maria Violeta Arraes de Alencar Gervaisau</h1>
+                    <h2 id="frequenciaTitulo">Frequência Mensal</h2>
+                </div>
+            </div>
+            <div class="selects-wrapper">
+                <div class="select-container">
+                    <label for="professorSelect">Professor:</label>
+                    <select id="professorSelect">
+                        <option value="">Selecione o Professor</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <label for="mesSelect">Mês de Referência:</label>
+                    <select id="mesSelect">
+                        <option value="">Selecione o Mês</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <label for="turmaSelect">Turma:</label>
+                    <select id="turmaSelect">
+                        <option value="">Selecione a Turma</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <label for="disciplinaSelect">Componente Curricular:</label>
+                    <select id="disciplinaSelect">
+                        <option value="">Selecione a Disciplina</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="mapaContainer" class="mapa-container">
+            <p class="loading">Selecione o professor, o mês, a turma e a disciplina para visualizar a frequência.</p>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBRjAPyT_dEGJD7i9QA-3SmZFMyz7eANL8",
+            authDomain: "stoantoniobarbalhaempresa.firebaseapp.com",
+            databaseURL: "https://stoantoniobarbalhaempresa-default-rtdb.firebaseio.com",
+            projectId: "stoantoniobarbalhaempresa",
+            storageBucket: "stoantoniobarbalhaempresa.firebasestorage.app",
+            messagingSenderId: "26806692492",
+            appId: "1:26806692492:web:993d20d3682336e665a9a9",
+            measurementId: "G-WQH402H8PB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Variáveis globais para armazenar os dados do Firebase
+        let registroDeAulaData = {};
+        let turmasData = {};
+        let professoresData = {};
+
+        // --- LÓGICA DA PÁGINA ---
+        const professorSelect = document.getElementById('professorSelect');
+        const mesSelect = document.getElementById('mesSelect');
+        const turmaSelect = document.getElementById('turmaSelect');
+        const disciplinaSelect = document.getElementById('disciplinaSelect');
+        const mapaContainer = document.getElementById('mapaContainer');
+        const frequenciaTitulo = document.getElementById('frequenciaTitulo');
+        const nomeMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        
+        // Função principal para buscar todos os dados do Firebase
+        const fetchData = async () => {
+            mapaContainer.innerHTML = '<p class="loading">Carregando dados...</p>';
+            try {
+                const professoresRef = ref(database, 'professores');
+                onValue(professoresRef, (snapshot) => {
+                    professoresData = snapshot.val() || {};
+                    populateSelects();
+                    renderTable();
+                });
+                
+                const registroRef = ref(database, 'registroDeAula');
+                onValue(registroRef, (snapshot) => {
+                    registroDeAulaData = snapshot.val() || {};
+                    populateSelects();
+                    renderTable();
+                });
+
+                const turmasRef = ref(database, 'turmas');
+                onValue(turmasRef, (snapshot) => {
+                    turmasData = snapshot.val() || {};
+                    populateSelects();
+                    renderTable();
+                });
+
+            } catch (e) {
+                console.error("Erro ao buscar dados do Firebase:", e);
+                mapaContainer.innerHTML = '<p class="error">Ocorreu um erro ao carregar os dados.</p>';
+            }
+            
+        };
+        
+        // Função para preencher os dropdowns com base nos dados do Firebase
+        const populateSelects = () => {
+            // Popula o select de professores usando userId como valor
+            const selectedProfValue = professorSelect.value;
+            professorSelect.innerHTML = '<option value="">Selecione o Professor</option>';
+            if (professoresData) {
+                const sortedProfessores = Object.values(professoresData).sort((a, b) => a.nome.localeCompare(b.nome));
+                sortedProfessores.forEach(prof => {
+                    const option = document.createElement('option');
+                    option.value = prof.userId;
+                    option.textContent = prof.nome;
+                    professorSelect.appendChild(option);
+                });
+            }
+            professorSelect.value = selectedProfValue;
+
+            const selectedProfessorUserId = professorSelect.value;
+            const turmas = new Set();
+            const disciplinas = new Set();
+            const meses = new Set();
+
+            if (registroDeAulaData) {
+                Object.values(registroDeAulaData).forEach(aula => {
+                    // Usa professorId para filtrar
+                    if (aula.professorUid === selectedProfessorUserId) {
+                        turmas.add(aula.turma);
+                        disciplinas.add(aula.disciplina);
+                        const [dia, mes, ano] = aula.dataRegistro.split('/');
+                        meses.add(`${mes}/${ano}`);
+                    }
+                });
+            }
+
+            // Popula os outros selects
+            const selectedMesValue = mesSelect.value;
+            mesSelect.innerHTML = '<option value="">Selecione o Mês</option>';
+            Array.from(meses).sort((a, b) => {
+                const [mesA, anoA] = a.split('/').map(Number);
+                const [mesB, anoB] = b.split('/').map(Number);
+                if (anoA !== anoB) return anoA - anoB;
+                return mesA - mesB;
+            }).forEach(mesAno => {
+                const [mesNum, anoNum] = mesAno.split('/').map(Number);
+                const nomeMes = nomeMeses[mesNum - 1];
+                const option = document.createElement('option');
+                option.value = mesAno;
+                option.textContent = `${nomeMes} de ${anoNum}`;
+                mesSelect.appendChild(option);
+            });
+            mesSelect.value = selectedMesValue;
+
+            const selectedTurmaValue = turmaSelect.value;
+            turmaSelect.innerHTML = '<option value="">Selecione a Turma</option>';
+            if (turmasData) {
+                const sortedTurmas = Object.values(turmasData).sort((a, b) => a.nome.localeCompare(b.nome));
+                sortedTurmas.forEach(turmaObj => {
+                    const turmaNome = turmaObj.nome;
+                    if (turmas.has(turmaNome)) {
+                        const option = document.createElement('option');
+                        option.value = turmaNome;
+                        option.textContent = turmaNome;
+                        option.dataset.curso = turmaObj.curso;
+                        turmaSelect.appendChild(option);
+                    }
+                });
+            }
+            turmaSelect.value = selectedTurmaValue;
+
+            const selectedDisciplinaValue = disciplinaSelect.value;
+            disciplinaSelect.innerHTML = '<option value="">Selecione a Disciplina</option>';
+            disciplinas.forEach(disciplina => {
+                const option = document.createElement('option');
+                option.value = disciplina;
+                option.textContent = disciplina;
+                disciplinaSelect.appendChild(option);
+            });
+            disciplinaSelect.value = selectedDisciplinaValue;
+        };
+
+        
+
+        
+
+        // Função para obter o nome do curso da turma selecionada
+        const getCursoDaTurma = (turmaNome) => {
+            const turma = Object.values(turmasData).find(t => t.nome === turmaNome);
+            return turma ? turma.curso : '';
+        };
+
+        const getAlunosDaTurma = (turmaNome) => {
+            const turma = Object.values(turmasData).find(t => t.nome === turmaNome);
+            if (turma && turma.alunos) {
+                return Object.values(turma.alunos);
+            }
+            return [];
+        };
+
+        // Função para renderizar a tabela
+        const renderTable = () => {
+            const selectedProfessorUserId = professorSelect.value;
+            const selectedMes = mesSelect.value;
+            const selectedTurma = turmaSelect.value;
+            const selectedDisciplina = disciplinaSelect.value;
+
+            // Encontra o professor e o nome correspondente
+            const professorObj = Object.values(professoresData).find(prof => prof.userId === selectedProfessorUserId);
+            const professorNome = professorObj ? professorObj.nome : '';
+
+            // Lógica para atualizar o título com o nome do curso e professor
+            const cursoNome = getCursoDaTurma(selectedTurma);
+            if (cursoNome) {
+                frequenciaTitulo.textContent = `Frequência Mensal - ${cursoNome}`;
+            }
+
+            if (!selectedProfessorUserId || !selectedMes || !selectedTurma || !selectedDisciplina) {
+                mapaContainer.innerHTML = '<p class="loading">Selecione o professor, o mês, a turma e a disciplina para visualizar a frequência.</p>';
+                return;
+            }
+
+            const alunosDaTurma = getAlunosDaTurma(selectedTurma);
+            const attendanceData = {};
+            const uniqueDates = new Set();
+            const classContentData = {};
+
+            const filteredData = Object.values(registroDeAulaData)
+                .filter(aula => {
+                    const [dia, mes, ano] = aula.dataRegistro.split('/');
+                    return aula.professorUid === selectedProfessorUserId &&
+                        aula.turma === selectedTurma &&
+                        aula.disciplina === selectedDisciplina &&
+                        `${mes}/${ano}` === selectedMes;
+                });
+
+            if (filteredData.length > 0) {
+                filteredData.forEach(aula => {
+                    const dataRegistro = aula.dataRegistro;
+                    uniqueDates.add(dataRegistro);
+                    classContentData[dataRegistro] = aula.conteudo || 'Nenhum conteúdo registrado.';
+                });
+            }
+
+            alunosDaTurma.forEach(aluno => {
+                attendanceData[aluno] = {
+                    faltasPorData: {},
+                    totalFaltas: 0
+                };
+                Array.from(uniqueDates).forEach(date => {
+                    attendanceData[aluno].faltasPorData[date] = 0;
+                });
+            });
+
+            filteredData.forEach(aula => {
+                const dataRegistro = aula.dataRegistro;
+                if (aula.infrequencia) {
+                    aula.infrequencia.forEach(infrequencia => {
+                        if (attendanceData[infrequencia.nome]) {
+                            attendanceData[infrequencia.nome].faltasPorData[dataRegistro] = infrequencia.faltas;
+                            attendanceData[infrequencia.nome].totalFaltas += infrequencia.faltas;
+                        }
+                    });
+                }
+            });
+
+            const sortedDates = Array.from(uniqueDates).sort((a, b) => {
+                const [d1, m1, y1] = a.split('/').map(Number);
+                const [d2, m2, y2] = b.split('/').map(Number);
+                return new Date(y1, m1 - 1, d1).getTime() - new Date(y2, m2 - 1, d2).getTime();
+            });
+
+            let tableHTML = `
+<table class="mapa-tabela">
+<thead>
+<tr>
+<th>Nº</th>
+<th class="aluno-nome">Estudante</th>
+${sortedDates.map(date => `<th class="centered-cell">${date}</th>`).join('')}
+<th class="centered-cell">Total de Faltas</th>
+</tr>
+</thead>
+<tbody>
+`;
+
+            if (alunosDaTurma.length > 0) {
+                alunosDaTurma.forEach((aluno, index) => {
+                    const alunoFaltas = attendanceData[aluno] || {
+                        faltasPorData: {},
+                        totalFaltas: 0
+                    };
+                    tableHTML += `
+<tr>
+<td>${index + 1}</td>
+<td>${aluno}</td>
+${sortedDates.map(date => `<td class="centered-cell">${alunoFaltas.faltasPorData[date] || '-'}</td>`).join('')}
+<td class="centered-cell">${alunoFaltas.totalFaltas > 0 ? alunoFaltas.totalFaltas : '-'}</td>
+</tr>
+`;
+                });
+            } else {
+                tableHTML += `
+<tr>
+<td colspan="${3 + sortedDates.length}" class="centered-cell">Nenhum aluno encontrado para os filtros selecionados.</td>
+</tr>
+`;
+            }
+
+            tableHTML += `
+</tbody>
+</table>
+`;
+
+            tableHTML += `
+<div class="conteudo-tabela">
+<h2>.</h2>
+<h2>Conteúdo das Aulas</h2>
+<table class="mapa-tabela">
+<thead>
+<tr>
+<th style="width: 150px;">Data</th>
+<th>Conteúdo da Aula</th>
+</tr>
+</thead>
+<tbody>
+`;
+
+            if (sortedDates.length > 0) {
+                sortedDates.forEach(date => {
+                    tableHTML += `
+<tr>
+<td>${date}</td>
+<td>${classContentData[date]}</td>
+</tr>
+`;
+                });
+            } else {
+                tableHTML += `
+<tr>
+<td colspan="2" class="centered-cell">Nenhum conteúdo encontrado para os filtros selecionados.</td>
+</tr>
+`;
+            }
+
+            tableHTML += `
+</tbody>
+</table>
+</div>
+`;
+
+            mapaContainer.innerHTML = tableHTML;
+        };
+
+        // Event Listeners para os dropdowns
+        professorSelect.addEventListener('change', () => {
+            mesSelect.value = '';
+            turmaSelect.value = '';
+            disciplinaSelect.value = '';
+            populateSelects();
+            renderTable();
+        });
+        mesSelect.addEventListener('change', renderTable);
+        turmaSelect.addEventListener('change', renderTable);
+        disciplinaSelect.addEventListener('change', renderTable);
+
+        
+
+        // Inicia o carregamento dos dados quando a página carrega
+        fetchData();
+    </script>
+</body>
+
+</html>

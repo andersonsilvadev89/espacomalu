@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "Savia",
-    "slug": "Savia",
+    "name": "EspacoMelu",
+    "slug": "EspacoMelu",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "savia",
+    "scheme": "espacomelu",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
@@ -21,7 +21,9 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.espacomelu",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -33,6 +35,19 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/54a793c1-0f63-4d0b-9f7a-632bef70a06a"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "54a793c1-0f63-4d0b-9f7a-632bef70a06a"
+      }
+    },
+    "owner": "andersonsilva.dev89"
   }
 }
