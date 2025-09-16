@@ -15,15 +15,16 @@ import { Users, Settings, LogOut, CircleHelp } from "lucide-react-native";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 
-const { width: screenWidth } = Dimensions.get("window");
-
 // --- Constantes de Design ---
+const { width: screenWidth } = Dimensions.get("window");
+const isWeb = Platform.OS === 'web';
+const isDesktop = isWeb && screenWidth > 768; // Definição de breakpoint
 const NUM_COLUMNS = 2;
 const SPACING = 20;
 const CARD_PADDING = 20;
 const BORDER_RADIUS = 26;
-const ICON_SIZE = 50;
-const LADO = 120;
+const ICON_SIZE = isDesktop ? 60 : 50;
+const LADO = isDesktop ? 160 : 120; // Aumenta o tamanho dos botões na web
 
 const COLORS = {
   primary: "#007AFF",
@@ -39,7 +40,7 @@ const COLORS = {
 
 const HomeScreen = () => {
   const navigate = (path: string) => router.push(path as any);
-  
+
   const mainOptions = [
     {
       label: "Reservas",
@@ -63,7 +64,7 @@ const HomeScreen = () => {
       path: "/sobreScreen",
     },
   ];
-  
+
   const confirmarLogout = () => {
     if(Platform.OS === 'web'){
       let resp = confirm("Tem certeza que deseja sair do aplicativo?");
@@ -108,19 +109,20 @@ const HomeScreen = () => {
         },
       ],
       { cancelable: true }
-    );
+      );
     }
-    
+
   };
 
   const renderGridItem = ({ item }: { item: (typeof mainOptions)[0] }) => {
+    // Cálculo do tamanho otimizado para mobile e web
     const itemWidth =
       (screenWidth - SPACING * 2 - SPACING * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
     const IconComponent = item.icon;
 
     return (
       <TouchableOpacity
-        style={[styles.card, { width: itemWidth }]}
+        style={[styles.card, { width: itemWidth, height: itemWidth }]} // Define a altura igual à largura
         activeOpacity={0.7}
         onPress={() => navigate(item.path)}
       >
@@ -131,20 +133,11 @@ const HomeScreen = () => {
   };
 
   const renderBottomRowItem = ({ item }: { item: (typeof bottomRowOptions)[0] }) => {
-    const horizontalPadding = Platform.OS === 'web'?SPACING + 60:SPACING;
-    const gapBetweenItems = SPACING / 2;
-    const totalGapWidth = gapBetweenItems * (bottomRowOptions.length - 1);
-    const availableWidth = Platform.OS === 'web'?(screenWidth - horizontalPadding * 2 - totalGapWidth)*0.4:screenWidth - horizontalPadding * 2 - totalGapWidth;
-    const logoutButtonRatio = 0.33;
-    const fixedOptionRatio = (1 - logoutButtonRatio) / 2;
-    let itemWidth;
-    let itemHeight;
-
     const IconComponent = item.icon;
+    const itemWidth = LADO; // Usando valor fixo
+    const itemHeight = LADO; // Usando valor fixo
 
     if (item.type === "logout") {
-      itemWidth = availableWidth * logoutButtonRatio;
-      itemHeight = itemWidth;
       return (
         <TouchableOpacity
           style={[
@@ -152,7 +145,7 @@ const HomeScreen = () => {
             {
               width: itemWidth,
               height: itemHeight,
-              marginHorizontal: gapBetweenItems / 2,
+              marginHorizontal: SPACING / 2,
             },
           ]}
           activeOpacity={0.7}
@@ -163,8 +156,6 @@ const HomeScreen = () => {
         </TouchableOpacity>
       );
     } else {
-      itemWidth = availableWidth * fixedOptionRatio;
-      itemHeight = itemWidth;
       return (
         <TouchableOpacity
           style={[
@@ -172,7 +163,7 @@ const HomeScreen = () => {
             {
               width: itemWidth,
               height: itemHeight,
-              marginHorizontal: gapBetweenItems / 2,
+              marginHorizontal: SPACING / 2,
             },
           ]}
           activeOpacity={0.7}
@@ -187,7 +178,7 @@ const HomeScreen = () => {
 const defaultFundoLocal = require('../../assets/images/fundo.png');
 
   return (
-    
+
     <ImageBackground source={defaultFundoLocal} style={styles.background}>
       <View style={styles.content}>
         <FlatList
@@ -213,7 +204,7 @@ const defaultFundoLocal = require('../../assets/images/fundo.png');
         </View>
       </View>
     </ImageBackground>
-    
+
   );
 };
 
@@ -272,7 +263,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     paddingVertical: SPACING / 2,
     marginBottom: Platform.OS === "ios" ? 10 : 0,
-    width: 400,
+    width: isDesktop ? 500 : "100%", // Ajusta a largura para desktop ou mobile
     alignSelf: "center",
   },
   bottomRowGrid: {
