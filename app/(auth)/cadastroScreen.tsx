@@ -354,7 +354,7 @@ export default function CadastroScreen() {
 const styles = StyleSheet.create({
   background: { flex: 1, width: '100%' },
   scrollContent: { flexGrow: 1, justifyContent: 'center', padding: 20 },
-  container: { backgroundColor: 'rgba(0, 0, 0, 0.21)', padding: 20, borderRadius: 10, width: 450, alignSelf: 'center' },
+  container: { backgroundColor: 'rgba(0, 0, 0, 0.21)', padding: 20, borderRadius: 10, width: 400, alignSelf: 'center' },
   title: { fontSize: 30, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
   profileImageContainer: { width: 100, height: 100, borderRadius: 50, backgroundColor: '#ddd', alignSelf: 'center', justifyContent: 'center', alignItems: 'center', marginBottom: 20, overflow: 'hidden' },
   profileImage: { width: '100%', height: '100%' },

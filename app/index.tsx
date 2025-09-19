@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as Updates from "expo-updates";
+import { Feather } from "@expo/vector-icons";
 
 export default function Index() {
   const { user, loading } = useAuth();

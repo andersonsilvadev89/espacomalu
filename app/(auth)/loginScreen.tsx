@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   containerWeb: {
-    width: 450,
+    width: 400,
     alignSelf: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.12)',
   },

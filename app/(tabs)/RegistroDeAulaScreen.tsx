@@ -13,6 +13,7 @@ import {
   Keyboard,
   StyleSheet,
   ImageBackground,
+  Image,
   Linking,
   Modal, // Importação do Modal para a versão web
 } from "react-native";
@@ -24,7 +25,7 @@ import { Calendar } from "react-native-calendars"; // Importação do calendári
 
 // Pode ser uma imagem local ou URL de fundo
 const defaultFundoLocal = require("../../assets/images/fundo.png");
-
+const calendario = require('../../assets/images/calendario.png');
 // Interface para os dados da reserva
 interface Reserva {
   id?: string;
@@ -250,7 +251,7 @@ export default function CadastroReservas() {
                 onPress={() => setShowCalendar(true)}
                 style={styles.calendarIcon}
               >
-                <Feather name="calendar" size={24} color="#555" />
+                <Image source={calendario} style={{height: 32, width:32}}/>
               </TouchableOpacity>
             </View>
 
@@ -437,8 +438,9 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    maxWidth: 450,
+    width: Platform.OS === "web" ? 400 : "100%",
     alignSelf: "center",
+    justifyContent: "center",
     backgroundColor: "rgba(0, 0, 0, 0.17)000ff",
     borderRadius: 20,
     margin: 5,
@@ -455,13 +457,12 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderRadius: 10,
     padding: 10,
-    marginBottom: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
-    minWidth: 400,
+    width: "100%",
   },
   title: {
     fontSize: 20,
@@ -476,25 +477,25 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     backgroundColor: "#fff",
+    height: 50,
   },
   inputWithIcon: {
+    height: 50,
+    marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 8,
-    backgroundColor: "#fff",
-    marginBottom: 10,
+    backgroundColor: "#d01e1eff",
   },
   dateInput: {
     flex: 1,
-    borderWidth: 0,
-    paddingRight: 50,
+    marginBottom:0,
   },
   calendarIcon: {
     position: "absolute",
-    right: 15,
-    padding: 5,
+    right: 5,
   },
   sectionTitle: {
     fontSize: 20,
@@ -540,6 +541,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
     flex: 1,
+    width: Platform.OS === "web" ? 380 : "90%",
   },
   productListOverlay: {
     position: "absolute",
@@ -633,13 +635,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+    width: Platform.OS === "web" ? 400 : "100%",
+    alignSelf: "center",
   },
   calendarContainer: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
-    width: "90%",
-    maxWidth: 400,
+    width: Platform.OS === "web" ? 400 : "90%",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,

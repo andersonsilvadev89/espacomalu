@@ -5,25 +5,25 @@ import { getReactNativePersistence, initializeAuth, GoogleAuthProvider } from 'f
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyCIn7zTvqxa4BpzgSrUxHIK62D1ek0jQw4",
-    authDomain: "espacomelu.firebaseapp.com",
-    databaseURL: "https://espacomelu-default-rtdb.firebaseio.com",
-    projectId: "espacomelu",
-    storageBucket: "espacomelu.firebasestorage.app",
-    messagingSenderId: "",
-    appId: "1:90966792541:android:8ac95e87de8af0b1c6b0b4",
-    measurementId: ""
+    apiKey: process.env.FIREBASE_API_KEY_PRINCIPAL,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN_PRINCIPAL,
+    databaseURL: process.env.FIREBASE_DATABASE_URL_PRINCIPAL,
+    projectId: process.env.FIREBASE_PROJECT_ID_PRINCIPAL,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET_PRINCIPAL,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID_PRINCIPAL,
+    appId: process.env.FIREBASE_APP_ID_PRINCIPAL,
+    measurementId: process.env.FIREBASE_MEASUREMENT_ID_PRINCIPAL
 };
 
 const firebaseConfigAdmin = {
-    apiKey: "AIzaSyBdhPa_6LB4VXl1w40Zkhcqrr9sB-uuZq4",
-    authDomain: "SEU_AUTH_DOMAIN",
-    databaseURL: "https://admin-42d85-default-rtdb.firebaseio.com/",
-    projectId: "admin-42d85",
-    storageBucket: "admin-42d85.firebasestorage.app",
-    messagingSenderId: "SEU_MESSAGING_SENDER_ID",
-    appId: "1:761725954340:android:b61fa6cdb24afb79d8abb1",
-    measurementId: "SEU_MEASUREMENT_ID"
+    apiKey: process.env.FIREBASE_API_KEY_ADMIN,
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN_ADMIN,
+    databaseURL: process.env.FIREBASE_DATABASE_URL_ADMIN,
+    projectId: process.env.FIREBASE_PROJECT_ID_ADMIN,
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET_ADMIN,
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID_ADMIN,
+    appId: process.env.FIREBASE_APP_ID_ADMIN,
+    measurementId: process.env.FIREBASE_MEASUREMENT_ID_ADMIN
 };
 
 // Inicializa os aplicativos com nomes diferentes para evitar conflitos
@@ -37,7 +37,7 @@ const adminDatabase = getDatabase(adminApp);
 
 // Inicializa a autenticação com a persistência AsyncStorage
 const auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage)
+    persistence: getReactNativePersistence(AsyncStorage)
 });
 
 // Outras instâncias de serviços

@@ -15,16 +15,15 @@ import { Users, Settings, LogOut, CircleHelp } from "lucide-react-native";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebaseConfig";
 
-// --- Constantes de Design ---
 const { width: screenWidth } = Dimensions.get("window");
-const isWeb = Platform.OS === 'web';
-const isDesktop = isWeb && screenWidth > 768; // Definição de breakpoint
+
+// --- Constantes de Design ---
 const NUM_COLUMNS = 2;
 const SPACING = 20;
 const CARD_PADDING = 20;
 const BORDER_RADIUS = 26;
-const ICON_SIZE = isDesktop ? 60 : 50;
-const LADO = isDesktop ? 160 : 120; // Aumenta o tamanho dos botões na web
+const ICON_SIZE = 50;
+const LADO = 120;
 
 const COLORS = {
   primary: "#007AFF",
@@ -40,7 +39,7 @@ const COLORS = {
 
 const HomeScreen = () => {
   const navigate = (path: string) => router.push(path as any);
-
+  
   const mainOptions = [
     {
       label: "Reservas",
@@ -52,7 +51,7 @@ const HomeScreen = () => {
   const bottomRowOptions = [
     {
       type: "nav",
-      label: "Configurações",
+      label: "Configuracao",
       icon: Settings,
       path: "/configuracoesScreen",
     },
@@ -64,7 +63,7 @@ const HomeScreen = () => {
       path: "/sobreScreen",
     },
   ];
-
+  
   const confirmarLogout = () => {
     if(Platform.OS === 'web'){
       let resp = confirm("Tem certeza que deseja sair do aplicativo?");
@@ -109,20 +108,18 @@ const HomeScreen = () => {
         },
       ],
       { cancelable: true }
-      );
+    );
     }
-
+    
   };
 
   const renderGridItem = ({ item }: { item: (typeof mainOptions)[0] }) => {
-    // Cálculo do tamanho otimizado para mobile e web
-    const itemWidth =
-      (screenWidth - SPACING * 2 - SPACING * (NUM_COLUMNS - 1)) / NUM_COLUMNS;
-    const IconComponent = item.icon;
+    const itemWidth =120;
+        const IconComponent = item.icon;
 
     return (
       <TouchableOpacity
-        style={[styles.card, { width: itemWidth, height: itemWidth }]} // Define a altura igual à largura
+        style={[styles.card, { width: itemWidth }]}
         activeOpacity={0.7}
         onPress={() => navigate(item.path)}
       >
@@ -133,19 +130,28 @@ const HomeScreen = () => {
   };
 
   const renderBottomRowItem = ({ item }: { item: (typeof bottomRowOptions)[0] }) => {
+    const horizontalPadding = Platform.OS === 'web'?SPACING + 60:SPACING;
+    const gapBetweenItems = SPACING / 2;
+    const totalGapWidth = gapBetweenItems * (bottomRowOptions.length - 1);
+    const availableWidth = Platform.OS === 'web'?(screenWidth - horizontalPadding * 2 - totalGapWidth)*0.4:screenWidth - horizontalPadding * 2 - totalGapWidth;
+    const logoutButtonRatio = 0.33;
+    const fixedOptionRatio = (1 - logoutButtonRatio) / 2;
+    let itemWidth;
+    let itemHeight;
+
     const IconComponent = item.icon;
-    const itemWidth = LADO; // Usando valor fixo
-    const itemHeight = LADO; // Usando valor fixo
 
     if (item.type === "logout") {
+      itemWidth = availableWidth * logoutButtonRatio;
+      itemHeight = itemWidth;
       return (
         <TouchableOpacity
           style={[
             styles.logoutButtonRound,
             {
-              width: itemWidth,
-              height: itemHeight,
-              marginHorizontal: SPACING / 2,
+              width: LADO,
+              height: LADO,
+              marginHorizontal: gapBetweenItems / 2,
             },
           ]}
           activeOpacity={0.7}
@@ -156,14 +162,16 @@ const HomeScreen = () => {
         </TouchableOpacity>
       );
     } else {
+      itemWidth = availableWidth * fixedOptionRatio;
+      itemHeight = itemWidth;
       return (
         <TouchableOpacity
           style={[
             styles.fixedOptionCard,
             {
-              width: itemWidth,
-              height: itemHeight,
-              marginHorizontal: SPACING / 2,
+              width: LADO,
+              height: LADO,
+              marginHorizontal: gapBetweenItems / 2,
             },
           ]}
           activeOpacity={0.7}
@@ -178,7 +186,7 @@ const HomeScreen = () => {
 const defaultFundoLocal = require('../../assets/images/fundo.png');
 
   return (
-
+    
     <ImageBackground source={defaultFundoLocal} style={styles.background}>
       <View style={styles.content}>
         <FlatList
@@ -204,7 +212,7 @@ const defaultFundoLocal = require('../../assets/images/fundo.png');
         </View>
       </View>
     </ImageBackground>
-
+    
   );
 };
 
@@ -216,7 +224,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    maxWidth: 450,
+    maxWidth: 400,
     paddingTop: 10,
     paddingHorizontal: SPACING,
     paddingBottom: Platform.OS === "ios" ? 20 : 10,
@@ -249,7 +257,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
     marginHorizontal: SPACING / 2,
-    maxWidth: 400,
+    maxWidth: 380,
   },
   cardText: {
     fontSize: 15,
@@ -263,7 +271,7 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     paddingVertical: SPACING / 2,
     marginBottom: Platform.OS === "ios" ? 10 : 0,
-    width: isDesktop ? 500 : "100%", // Ajusta a largura para desktop ou mobile
+    width: 380,
     alignSelf: "center",
   },
   bottomRowGrid: {
